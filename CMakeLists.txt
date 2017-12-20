@@ -25,12 +25,16 @@ endif ()
 
 # library
 include_directories(${INCLUDE_DIR})
-add_library(${PROJECT_NAME} 
+add_library(${PROJECT_NAME}
     "${SOURCE_DIR}/EasyFlags.cpp"
 )
 
 target_link_libraries(${PROJECT_NAME} autojson)
 target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDE_DIR})
+
+add_executable(example-1 "examples/ex1.cpp")
+target_link_libraries(example-1 PUBLIC ${PROJECT_NAME})
+install(TARGETS example-1 DESTINATION example1)
 
 # INTERFACE + LIBRARY
 set(INCLUDE_INSTALL_DIR       "include")

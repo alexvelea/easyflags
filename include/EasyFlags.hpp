@@ -18,13 +18,15 @@ struct CommandLineArgument {
     std::string description;
 
     std::string argumentType;
-    std::string defaultValue, implicitValue;
+    autojson::JSON defaultValue, implicitValue;
 
     std::function<autojson::JSON()> stringifyFunction;
     std::function<void(const autojson::JSON&)> deserializeFunction;
     std::function<void(CommandLineArgument&, cxxopts::Options&)> optionAdderGen;
 
     void* object;
+
+    CommandLineArgument() { }
 
     CommandLineArgument(std::function<autojson::JSON()> stringifyFunction, std::function<void(const autojson::JSON&)> deserializeFunction,
                         std::function<void(CommandLineArgument&, cxxopts::Options&)> optionAdderGen, void* object, std::string longName);
@@ -39,14 +41,13 @@ struct CommandLineArgument {
 
     CommandLineArgument& ArgumentType(const std::string& argumentType);
 
-    CommandLineArgument& DefaultValue(const std::string& defaultValue);
+    CommandLineArgument& DefaultValue(const autojson::JSON& defaultValue);
 
-    CommandLineArgument& ImplicitValue(const std::string& implicitValue);
+    CommandLineArgument& ImplicitValue(const autojson::JSON& implicitValue);
 
     operator CommandLineArgumentFinish();
 };
 
-extern std::vector<CommandLineArgument> allArguments;
 
 void ParseEasyFlags(int argc, char** argv);
 
@@ -55,17 +56,17 @@ void ParseEasyFlags(int argc, char** argv);
 #define MACROPASTER(x, y) x##_##y
 #define MACROEVALUATOR(x, y) MACROPASTER(x, y)
 
-#define AddArgument(type, name)                                                                                                                            \
-    type name;                                                                                                                                             \
+#define AddArgument(TYPE, name)                                                                                                                            \
+    TYPE name;                                                                                                                                             \
     easyflags::CommandLineArgumentFinish MACROEVALUATOR(_num, __COUNTER__) =                                                                               \
-        easyflags::CommandLineArgument([]() -> autojson::JSON { return autojson::JSON(name); }, [](const autojson::JSON& j) { name = j.operator type(); }, \
+        easyflags::CommandLineArgument([]() -> autojson::JSON { return autojson::JSON(name); }, [](const autojson::JSON& j) { name = j.operator TYPE(); }, \
                                        [](easyflags::CommandLineArgument& cmdarg, cxxopts::Options& options) {                                             \
-                                           auto value = cxxopts::value<type>(name);                                                                        \
-                                           if (cmdarg.defaultValue != "") {                                                                                \
-                                               value->default_value(cmdarg.defaultValue);                                                                  \
+                                           auto value = cxxopts::value<TYPE>(name);                                                                        \
+                                           if (cmdarg.defaultValue.type != autojson::JSONType::INVALID) {                                                                \
+                                               value->default_value(cmdarg.defaultValue.stringify(true));                                                  \
                                            }                                                                                                               \
-                                           if (cmdarg.implicitValue != "") {                                                                               \
-                                               value->implicit_value(cmdarg.implicitValue);                                                                \
+                                           if (cmdarg.implicitValue.type != autojson::JSONType::INVALID) {                                                               \
+                                               value->implicit_value(cmdarg.implicitValue.stringify(true));                                                \
                                            }                                                                                                               \
                                            std::string name = cmdarg.shortName;                                                                            \
                                            if (cmdarg.longName != "") {                                                                                    \

@@ -10,8 +10,6 @@
 
 namespace easyflags {
 
-std::vector<CommandLineArgument> allArguments;
-
 AddArgument(std::string, generateJSONConfig)
     .Description("Generate a JSON file that will contain all the current arguments. Write that JSON to FILE")
     .Group("Usage")
@@ -55,18 +53,27 @@ CommandLineArgument& CommandLineArgument::ArgumentType(const std::string& argume
     return *this;
 }
 
-CommandLineArgument& CommandLineArgument::DefaultValue(const std::string& defaultValue) {
+CommandLineArgument& CommandLineArgument::DefaultValue(const autojson::JSON& defaultValue) {
     this->defaultValue = defaultValue;
     return *this;
 }
 
-CommandLineArgument& CommandLineArgument::ImplicitValue(const std::string& implicitValue) {
+CommandLineArgument& CommandLineArgument::ImplicitValue(const autojson::JSON& implicitValue) {
     this->implicitValue = implicitValue;
     return *this;
 }
 
+std::vector<CommandLineArgument>* arg = nullptr;
+int num_args = 0;
+
 CommandLineArgument::operator CommandLineArgumentFinish() {
-    allArguments.push_back(*this);
+    static std::vector<CommandLineArgument> allArguments;
+    if (arg == nullptr) {
+        num_args++;
+        allArguments.push_back(*this);
+    } else {
+        arg = &allArguments;
+    }
     return CommandLineArgumentFinish();
 }
 
@@ -152,7 +159,21 @@ void ParseEasyFlags(int argc, char** argv) {
     std::vector<std::string> allOptions = {"help"};
     std::vector<std::string> allGroups = {"Usage", ""};
     std::map<std::string, CommandLineArgument*> argumentHash;
-    for (auto& cmdarg : allArguments) {
+    arg = new std::vector<CommandLineArgument>();
+    CommandLineArgumentFinish aux;
+    aux = CommandLineArgument();
+
+    if (num_args != (int)arg->size()) {
+        std::cerr << "Failed to get all command line args! Contact support\n";
+        std::cerr << "Expected:\t" << num_args << '\n';
+        std::cerr << "Actually got:\t" << arg->size() << '\n';
+        for (auto itr : *arg) {
+            std::cerr << itr.longName << '\n';
+        }
+        exit(-1);
+    }
+
+    for (auto& cmdarg : *arg) {
         argumentHash[cmdarg.longName] = &cmdarg;
         allOptions.push_back(cmdarg.longName);
         allGroups.push_back(cmdarg.group);
@@ -176,9 +197,9 @@ void ParseEasyFlags(int argc, char** argv) {
     }
 
     try {
-        auto result = options.parse(argc_copy, argv_copy);
+        options.parse(argc_copy, argv_copy);
 
-        if (result.count("help")) {
+        if (options.count("help")) {
             std::cout << options.help(allGroups) << std::endl;
             exit(0);
         }
