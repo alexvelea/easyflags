@@ -18,6 +18,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${LIB_PATH})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BIN_PATH})
 
 # thirdparty
+add_definitions(-Dautojsonuselib)
 if (NOT TARGET autojson)
     add_subdirectory(thirdparty/autojson)
 endif ()
