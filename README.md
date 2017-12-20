@@ -5,7 +5,7 @@ AddArgument(string, logFile).Group("Logging").Name("log_file").Short("l")
 
 AddArgument(int, logLevel).Group("Logging").Name("v,verbose_level")
         .DefaultValue(0).ImplicitValue(-1, "all logging")
-        .ArgumentType("LEVEL").Description("Print any logs with level <= verbose_level")
+        .ArgumentType("LEVEL").Description("Print any logs with level <= verbose_level");
 
 AddArgument(bool, logInfo).Group("Logging").Name("info")
         .DefaultValue(0).ImplicitValue(1)
