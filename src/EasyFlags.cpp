@@ -142,7 +142,7 @@ void ApplyJSONFile(const std::string& filePath, std::map<std::string, CommandLin
     }
 }
 
-void InitCommandLineArguments(int argc, char** argv) {
+void ParseEasyFlags(int argc, char** argv) {
     cxxopts::Options options("");
 
     std::vector<std::string> JSONImports;
