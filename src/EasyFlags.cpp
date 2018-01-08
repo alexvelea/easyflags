@@ -192,7 +192,7 @@ void ParseEasyFlags(int argc, char** argv) {
     int argc_copy = argc;
     char** argv_copy = (char**)malloc(argc * sizeof(char*));
     for (int i = 0; i < argc_copy; i += 1) {
-        argv_copy[i] = (char*)malloc(strlen(argv[i]) * sizeof(char));
+        argv_copy[i] = (char*)malloc((strlen(argv[i]) + 1) * sizeof(char));
         strcpy(argv_copy[i], argv[i]);
     }
 
