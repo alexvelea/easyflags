@@ -159,7 +159,8 @@ void ParseEasyFlags(int argc, char** argv) {
     std::vector<std::string> allOptions = {"help"};
     std::vector<std::string> allGroups = {"Usage", ""};
     std::map<std::string, CommandLineArgument*> argumentHash;
-    arg = new std::vector<CommandLineArgument>();
+    std::vector<CommandLineArgument> *tempArg;
+    tempArg = arg = new std::vector<CommandLineArgument>();
     CommandLineArgumentFinish aux;
     aux = CommandLineArgument();
 
@@ -256,6 +257,11 @@ void ParseEasyFlags(int argc, char** argv) {
         std::cout << "error parsing options: " << e.what() << "\n";
         exit(1);
     }
+    delete tempArg;
+    for (int i = 0; i < argc; ++i) {
+        free(argv_copy[i]);
+    }
+    free(argv_copy);
 }
 
 } // namespace easyflags
