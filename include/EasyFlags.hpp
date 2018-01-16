@@ -63,10 +63,18 @@ void ParseEasyFlags(int argc, char** argv);
                                        [](easyflags::CommandLineArgument& cmdarg, cxxopts::Options& options) {                                             \
                                            auto value = cxxopts::value<TYPE>(name);                                                                        \
                                            if (cmdarg.defaultValue.type != autojson::JSONType::INVALID) {                                                  \
-                                               value->default_value(cmdarg.defaultValue.stringify(true));                                                  \
+                                                auto strValue = cmdarg.defaultValue.stringify(true);                                                       \
+                                                if (cmdarg.defaultValue.type == autojson::JSONType::STRING) {                                              \
+                                                    strValue = strValue.substr(1, strValue.size() - 2);                                                    \
+                                                }                                                                                                          \
+                                                value->default_value(strValue);                                                                            \
                                            }                                                                                                               \
                                            if (cmdarg.implicitValue.type != autojson::JSONType::INVALID) {                                                 \
-                                               value->implicit_value(cmdarg.implicitValue.stringify(true));                                                \
+                                                auto strValue = cmdarg.implicitValue.stringify(true);                                                      \
+                                                if (cmdarg.implicitValue.type == autojson::JSONType::STRING) {                                             \
+                                                    strValue = strValue.substr(1, strValue.size() - 2);                                                    \
+                                                }                                                                                                          \
+                                                value->implicit_value(strValue);                                                                           \
                                            }                                                                                                               \
                                            std::string name = cmdarg.shortName;                                                                            \
                                            if (cmdarg.longName != "") {                                                                                    \
