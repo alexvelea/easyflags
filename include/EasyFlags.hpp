@@ -58,14 +58,14 @@ void ParseEasyFlags(int argc, char** argv);
 
 #define AddArgument(TYPE, name)                                                                                                                            \
     TYPE name;                                                                                                                                             \
-    easyflags::CommandLineArgumentFinish MACROEVALUATOR(_num, __COUNTER__) =                                                                               \
+    static easyflags::CommandLineArgumentFinish MACROEVALUATOR(_num, __COUNTER__) =                                                                        \
         easyflags::CommandLineArgument([]() -> autojson::JSON { return autojson::JSON(name); }, [](const autojson::JSON& j) { name = j.operator TYPE(); }, \
                                        [](easyflags::CommandLineArgument& cmdarg, cxxopts::Options& options) {                                             \
                                            auto value = cxxopts::value<TYPE>(name);                                                                        \
-                                           if (cmdarg.defaultValue.type != autojson::JSONType::INVALID) {                                                                \
+                                           if (cmdarg.defaultValue.type != autojson::JSONType::INVALID) {                                                  \
                                                value->default_value(cmdarg.defaultValue.stringify(true));                                                  \
                                            }                                                                                                               \
-                                           if (cmdarg.implicitValue.type != autojson::JSONType::INVALID) {                                                               \
+                                           if (cmdarg.implicitValue.type != autojson::JSONType::INVALID) {                                                 \
                                                value->implicit_value(cmdarg.implicitValue.stringify(true));                                                \
                                            }                                                                                                               \
                                            std::string name = cmdarg.shortName;                                                                            \
